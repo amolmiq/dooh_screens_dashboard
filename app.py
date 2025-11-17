@@ -120,9 +120,27 @@ def load_country_data(country: str) -> pd.DataFrame:
         st.error(f"Error loading data: {e}")
         st.stop()
 
-# Header
-st.title("📍 DOOH Screens Interactive Dashboard")
-st.markdown("### Explore Digital Out-of-Home Screen Locations Worldwide")
+
+
+st.markdown(
+    """
+    <div style="text-align: right;">
+        <img src="https://www.wearemiq.com/_nuxt/logo.B0baRclm.png" width="70">
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Header    
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 0.5rem; padding-left: 0px;">
+        <h1 style="margin: 0;">📍 DOOH Screens Dashboard</h1>
+        <h3 style="margin: 0; padding-left: 70px; font-weight: 500; color: #2B0030;">Explore Digital Out-of-Home Screen Locations</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 st.markdown("---")
 
 # Sidebar filters
@@ -182,28 +200,28 @@ if selected_venue_types and not vt_all:
     filtered_df = filtered_df[filtered_df['Venue type'].isin(selected_venue_types)]
 
 # Display metrics
-col1, col2, col3, col4, col5 = st.columns(5)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.metric("Total Screens", len(filtered_df))
 
-with col2:
-    st.metric("Countries", filtered_df['Country'].nunique())
+# with col2:
+#     st.metric("Countries", filtered_df['Country'].nunique())
 
-with col3:
+with col2:
     st.metric("Media Owners", filtered_df['Media owner'].nunique())
 
-with col4:
+with col3:
     image_allowed = len(filtered_df[filtered_df['Allow Image'] == 'Yes'])
     st.metric("Image Enabled", image_allowed)
 
-with col5:
+with col4:
     video_allowed = len(filtered_df[filtered_df['Allow Video'] == 'Yes'])
     st.metric("Video Enabled", video_allowed)
 
 st.markdown("---")
 
-st.subheader("🗺️ Screen Locations Map")
+st.subheader("🗺️ Screens Location")
 
 if len(filtered_df) > 0:
     # Prepare data for map with tooltip information
