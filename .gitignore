@@ -1,0 +1,33 @@
+# Python/Streamlit project ignores
+# Virtual envs
+.venv/
+venv/
+ENV/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temp
+logs/
+*.log
+nohup.out
+
+# Secrets/keys
+*.pem
+*.key
+*.crt
+.streamlit/secrets.toml
+
+# Notebooks
+.ipynb_checkpoints/
+
+# PyDeck/Map artifacts
+.deck.gl/

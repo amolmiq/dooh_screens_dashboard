@@ -1,0 +1,17 @@
+[theme]
+base = "light"
+primaryColor = "#2B0030" # MiQ Midnight Blue for selected accents
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F6"
+textColor = "#2B0030" # MiQ Midnight Blue for text
+font = "sans serif"
+
+[server]
+headless = true
+enableCORS = true
+enableXsrfProtection = true
+maxUploadSize = 200
+baseUrlPath = "dooh_planner" # Serve app at /dooh_planner path via reverse proxy
+
+[browser]
+gatherUsageStats = false
