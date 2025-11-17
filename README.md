@@ -100,6 +100,18 @@ streamlit run app.py --server.port 8502
 6. Set main file path to `app.py`
 7. Click "Deploy"
 
+## Deploying on Streamlit Community Cloud
+
+If you can’t commit the hidden `.streamlit` folder, use this alternative config path:
+
+- This repo includes `streamlit_config/config.toml` (non-hidden).
+- In your Streamlit app settings (Advanced settings → Environment variables), set:
+   - `STREAMLIT_CONFIG=streamlit_config/config.toml`
+
+This ensures the app defaults to the Light theme everywhere. No other server settings are required on Community Cloud.
+
+Note: The EC2/nginx deployment uses `.streamlit/config.toml` which includes a `server.baseUrlPath` for `/dooh_planner`. Do not use that file on Community Cloud.
+
 ### 2. Docker Deployment
 
 Create a `Dockerfile`:
