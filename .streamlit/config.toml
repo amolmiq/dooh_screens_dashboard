@@ -1,0 +1,7 @@
+[theme]
+base = "light"
+primaryColor = "#2B0030" # MiQ Midnight Blue for selected accents
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F6"
+textColor = "#2B0030" # MiQ Midnight Blue for text
+font = "sans serif"
