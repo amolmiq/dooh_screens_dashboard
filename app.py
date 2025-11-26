@@ -301,7 +301,7 @@ with tabs[0]:
             x=venue_counts.values,
             y=venue_counts.index,
             orientation='h',
-            title='Top 10 Venue Types',
+            title='Top Venue Types',
             labels={'x': 'Count', 'y': 'Venue Type'},
             color_discrete_sequence=["#FF6500"]
         )
@@ -313,7 +313,7 @@ with tabs[0]:
         fig2 = px.pie(
             values=owner_counts.values,
             names=owner_counts.index,
-            title='Top 5 Media Owners',
+            title='Top Media Owners',
             color_discrete_sequence=brand_seq
         )
         fig2.update_layout(height=320, margin=dict(l=0, r=0, t=30, b=0))
@@ -329,7 +329,7 @@ with tabs[0]:
         fig3 = px.bar(
             x=region_counts.index,
             y=region_counts.values,
-            title='Top 10 Regions',
+            title='Top Regions',
             labels={'x': 'Region', 'y': 'Count'},
             color_discrete_sequence=["#2B0030"]
         )
