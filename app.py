@@ -62,6 +62,10 @@ def load_data(cntry: str) -> pd.DataFrame:
         df = pd.read_csv('DOOH_Screens_data_SG.csv', encoding='cp1252')
     elif cntry == 'HK':
         df = pd.read_csv('DOOH_Screens_data_HK.csv', encoding='utf-8')
+    elif cntry == 'SG Breakdown B1':
+        df = pd.read_csv('DOOH_Screens_data_SG_Breakdown_B1.csv', encoding='utf-8')
+    elif cntry == 'SG Breakdown B2':
+        df = pd.read_csv('DOOH_Screens_data_SG_Breakdown_B2.csv', encoding='utf-8')
     
     # Clean column names (remove trailing spaces)
     df.columns = df.columns.str.strip()
@@ -147,12 +151,16 @@ st.markdown("---")
 st.sidebar.header("🔍 Filters")
 
 # Country filter (single select; no 'All')
-country_options = ['Singapore', 'Hong Kong']
+country_options = ['Singapore', 'SG Breakdown B1', 'SG Breakdown B2','Hong Kong']
 selected_country = st.sidebar.selectbox("Country", country_options, index=0)
 
 # Get the country data
 if selected_country == 'Singapore':
     df = load_country_data('SG')
+elif selected_country == 'SG Breakdown B1':
+    df = load_country_data('SG Breakdown B1')
+elif selected_country == 'SG Breakdown B2':
+    df = load_country_data('SG Breakdown B2')
 elif selected_country == 'Hong Kong':
     df = load_country_data('HK')
 
