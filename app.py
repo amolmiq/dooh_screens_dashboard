@@ -151,7 +151,7 @@ st.markdown("---")
 st.sidebar.header("🔍 Filters")
 
 # Country filter (single select; no 'All')
-country_options = ['Singapore', 'SG Breakdown B1', 'SG Breakdown B2','Hong Kong']
+country_options = ['SG Breakdown B1', 'SG Breakdown B2','Hong Kong']
 selected_country = st.sidebar.selectbox("Country", country_options, index=0)
 
 # Get the country data
