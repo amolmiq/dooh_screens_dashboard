@@ -262,6 +262,39 @@ if len(filtered_df) > 0:
     map_data = filtered_df[map_cols].copy()
     map_data.columns = map_rename
     
+    # Assign a distinct color per Venue Info value
+    if has_venue_info:
+        # Palette of bright / light colors visible on both dark and light maps
+        _color_palette = [
+            [255, 160, 60, 220],   # Bright Orange
+            [255, 230, 50, 220],   # Vivid Yellow
+            [255, 100, 150, 220],  # Hot Pink
+            [100, 220, 255, 220],  # Sky Blue
+            [130, 255, 130, 220],  # Lime Green
+            [255, 130, 255, 220],  # Magenta / Orchid
+            [255, 200, 100, 220],  # Gold
+            [100, 255, 210, 220],  # Aquamarine
+            [255, 120, 120, 220],  # Salmon
+            [180, 180, 255, 220],  # Lavender
+            [200, 255, 100, 220],  # Yellow-Green
+            [255, 180, 180, 220],  # Light Coral
+            [100, 240, 180, 220],  # Mint
+            [255, 210, 150, 220],  # Peach
+            [150, 220, 255, 220],  # Light Blue
+            [255, 160, 200, 220],  # Pink
+            [220, 255, 160, 220],  # Light Lime
+            [180, 230, 255, 220],  # Powder Blue
+            [255, 200, 200, 220],  # Blush
+            [200, 255, 200, 220],  # Pale Green
+        ]
+        unique_venues = sorted(map_data['Venue Info'].dropna().unique().tolist())
+        venue_color_map = {v: _color_palette[i % len(_color_palette)] for i, v in enumerate(unique_venues)}
+        default_color = [158, 158, 158, 180]  # Grey for NaN / unknown
+        map_data['color'] = map_data['Venue Info'].map(venue_color_map).apply(lambda c: c if isinstance(c, list) else default_color)
+    else:
+        map_data['color'] = [[255, 101, 0, 180]] * len(map_data)
+        venue_color_map = None
+    
     # Calculate center point
     center_lat = map_data['lat'].mean()
     center_lon = map_data['lon'].mean()
@@ -277,12 +310,12 @@ if len(filtered_df) > 0:
     else:
         zoom_level = 8
     
-    # Brand color for pins: MiQ Orange with alpha
+    # Color pins by Venue Info
     layer = pdk.Layer(
         'ScatterplotLayer',
         data=map_data,
         get_position=['lon', 'lat'],
-        get_color='[255, 101, 0, 180]',
+        get_color='color',
         get_radius=100,
         pickable=True,
         auto_highlight=True,
@@ -315,6 +348,20 @@ if len(filtered_df) > 0:
     if os.getenv("MAPBOX_API_KEY"):
         deck_kwargs["map_style"] = 'mapbox://styles/mapbox/light-v10'
     st.pydeck_chart(pdk.Deck(**deck_kwargs), use_container_width=True)
+    
+    # Show color legend for Venue Info
+    if has_venue_info and venue_color_map:
+        legend_html = '<div style="display:flex; flex-wrap:wrap; gap:12px 24px; padding:8px 0;">'
+        for venue, rgba in venue_color_map.items():
+            rgb_str = f'rgb({rgba[0]},{rgba[1]},{rgba[2]})'
+            legend_html += (
+                f'<div style="display:flex; align-items:center; gap:6px;">'
+                f'<span style="display:inline-block;width:14px;height:14px;border-radius:50%;'
+                f'background:{rgb_str};"></span>'
+                f'<span style="font-size:13px;">{venue}</span></div>'
+            )
+        legend_html += '</div>'
+        st.markdown(legend_html, unsafe_allow_html=True)
 else:
     st.warning("No screens match the selected filters.")
 
