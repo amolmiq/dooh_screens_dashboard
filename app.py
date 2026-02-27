@@ -62,6 +62,8 @@ def load_data(cntry: str) -> pd.DataFrame:
         df = pd.read_csv('DOOH_Screens_data_SG.csv', encoding='cp1252')
     elif cntry == 'HK':
         df = pd.read_csv('DOOH_Screens_data_HK.csv', encoding='utf-8')
+    elif cntry == 'HK_NEW':
+        df = pd.read_csv('DOOH_Screens_data_HK_r23.csv', encoding='utf-8')
     elif cntry == 'SG Breakdown B1':
         df = pd.read_csv('DOOH_Screens_data_SG_Breakdown_B1.csv', encoding='utf-8')
     elif cntry == 'SG Breakdown B2':
@@ -151,11 +153,13 @@ st.markdown("---")
 st.sidebar.header("🔍 Filters")
 
 # Country filter (single select; no 'All')
-country_options = ['SG Breakdown B1', 'SG Breakdown B2','Hong Kong']
+country_options = ['Hong Kong NEW']
 selected_country = st.sidebar.selectbox("Country", country_options, index=0)
 
 # Get the country data
-if selected_country == 'Singapore':
+if selected_country == 'Hong Kong NEW':
+    df = load_country_data('HK_NEW')
+elif selected_country == 'Singapore':
     df = load_country_data('SG')
 elif selected_country == 'SG Breakdown B1':
     df = load_country_data('SG Breakdown B1')
@@ -165,8 +169,7 @@ elif selected_country == 'Hong Kong':
     df = load_country_data('HK')
 
 # Region filter (multi-select with All, depends on selected country)
-region_base = df[df['Country'] == selected_country]
-region_options = sorted(region_base['Site region (state)'].dropna().unique().tolist())
+region_options = sorted(df['Site region (state)'].dropna().unique().tolist())
 selected_regions, regions_all = multiselect_with_all("Region", region_options, key="filter_region")
 
 # Dimensions filter (multi-select with All)
@@ -187,10 +190,14 @@ selected_spot_lengths, spots_all = multiselect_with_all("Spot Length (s)", spot_
 venue_type_options = sorted(df['Venue type'].dropna().unique().tolist())
 selected_venue_types, vt_all = multiselect_with_all("Venue Type", venue_type_options, key="filter_venue_type")
 
+# Venue Info filter (only for datasets that have this column)
+has_venue_info = 'Venue Info' in df.columns
+if has_venue_info:
+    venue_info_options = sorted(df['Venue Info'].dropna().unique().tolist())
+    selected_venue_info, vi_all = multiselect_with_all("Venue Info", venue_info_options, key="filter_venue_info")
+
 # Apply filters
 filtered_df = df.copy()
-
-filtered_df = filtered_df[filtered_df['Country'] == selected_country]
 
 if selected_regions and not regions_all:
     filtered_df = filtered_df[filtered_df['Site region (state)'].isin(selected_regions)]
@@ -206,6 +213,9 @@ if selected_spot_lengths and not spots_all:
 
 if selected_venue_types and not vt_all:
     filtered_df = filtered_df[filtered_df['Venue type'].isin(selected_venue_types)]
+
+if has_venue_info and not vi_all:
+    filtered_df = filtered_df[filtered_df['Venue Info'].isin(selected_venue_info)]
 
 # Display metrics
 col1, col2, col3, col4 = st.columns(4)
@@ -233,13 +243,17 @@ st.subheader("🗺️ Screens Location")
 
 if len(filtered_df) > 0:
     # Prepare data for map with tooltip information
-    map_data = filtered_df[['Screen latitude', 'Screen longitude', 'Screen name', 
-                             'Venue type', 'Media owner', 'Site location (city)', 
-                             'Dimensions (W x H)', 'Allow Image', 'Allow Video', 
-                             'Spot length']].copy()
-    
-    map_data.columns = ['lat', 'lon', 'Screen Name', 'Venue Type', 'Media Owner', 
-                       'City', 'Dimensions', 'Allow Image', 'Allow Video', 'Spot Length']
+    map_cols = ['Screen latitude', 'Screen longitude', 'Screen name', 
+                 'Venue type', 'Media owner', 'Site location (city)', 
+                 'Dimensions (W x H)', 'Allow Image', 'Allow Video', 
+                 'Spot length']
+    map_rename = ['lat', 'lon', 'Screen Name', 'Venue Type', 'Media Owner', 
+                  'City', 'Dimensions', 'Allow Image', 'Allow Video', 'Spot Length']
+    if has_venue_info:
+        map_cols.append('Venue Info')
+        map_rename.append('Venue Info')
+    map_data = filtered_df[map_cols].copy()
+    map_data.columns = map_rename
     
     # Calculate center point
     center_lat = map_data['lat'].mean()
@@ -278,7 +292,7 @@ if len(filtered_df) > 0:
     # Create tooltip
     tooltip = {
         "html": """
-        <div style=\"background-color: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);\">\n            <b style=\"color: #2B0030; font-size: 14px;\">{Screen Name}</b><br/>\n            <hr style=\"margin: 5px 0; border: none; border-top: 1px solid #ddd;\">\n            <b>Venue Type:</b> {Venue Type}<br/>\n            <b>Media Owner:</b> {Media Owner}<br/>\n            <b>City:</b> {City}<br/>\n            <b>Dimensions:</b> {Dimensions}<br/>\n            <b>Allow Image:</b> {Allow Image}<br/>\n            <b>Allow Video:</b> {Allow Video}<br/>\n            <b>Spot Length:</b> {Spot Length}s\n        </div>\n        """,
+        <div style=\"background-color: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);\">\n            <b style=\"color: #2B0030; font-size: 14px;\">{Screen Name}</b><br/>\n            <hr style=\"margin: 5px 0; border: none; border-top: 1px solid #ddd;\">\n            <b>Venue Type:</b> {Venue Type}<br/>\n            """ + ("""<b>Venue Info:</b> {Venue Info}<br/>\n            """ if has_venue_info else "") + """<b>Media Owner:</b> {Media Owner}<br/>\n            <b>City:</b> {City}<br/>\n            <b>Dimensions:</b> {Dimensions}<br/>\n            <b>Allow Image:</b> {Allow Image}<br/>\n            <b>Allow Video:</b> {Allow Video}<br/>\n            <b>Spot Length:</b> {Spot Length}s\n        </div>\n        """,
         "style": {
             "backgroundColor": "white",
             "color": "black"
@@ -353,6 +367,8 @@ with tabs[1]:
         'Site region (state)', 'Country', 'Dimensions (W x H)', 'Orientation',
         'Allow Image', 'Allow Video', 'Spot length'
     ]
+    if has_venue_info:
+        display_columns.insert(2, 'Venue Info')
     st.dataframe(
         filtered_df[display_columns].reset_index(drop=True),
         use_container_width=True,
