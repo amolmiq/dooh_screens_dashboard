@@ -168,6 +168,20 @@ elif selected_country == 'SG Breakdown B2':
 elif selected_country == 'Hong Kong':
     df = load_country_data('HK')
 
+# Venue Info filter (only for datasets that have this column)
+has_venue_info = 'Venue Info' in df.columns
+if has_venue_info:
+    venue_info_options = sorted(df['Venue Info'].dropna().unique().tolist())
+    selected_venue_info, vi_all = multiselect_with_all("Venue Info", venue_info_options, key="filter_venue_info")
+
+# Venue Type filter (multi-select with All)
+venue_type_options = sorted(df['Venue type'].dropna().unique().tolist())
+selected_venue_types, vt_all = multiselect_with_all("Venue Type", venue_type_options, key="filter_venue_type")
+
+# Media Owner filter (multi-select with All)
+media_owner_options = sorted(df['Media owner'].dropna().unique().tolist())
+selected_media_owners, mo_all = multiselect_with_all("Media Owner", media_owner_options, key="filter_media_owner")
+
 # Region filter (multi-select with All, depends on selected country)
 region_options = sorted(df['Site region (state)'].dropna().unique().tolist())
 selected_regions, regions_all = multiselect_with_all("Region", region_options, key="filter_region")
@@ -186,18 +200,17 @@ selected_allow_video, allow_video_all = multiselect_with_all(
 spot_lengths_all = sorted([int(x) for x in df['Spot length'].dropna().unique().tolist()])
 selected_spot_lengths, spots_all = multiselect_with_all("Spot Length (s)", spot_lengths_all, key="filter_spot_length")
 
-# Venue Type filter (multi-select with All)
-venue_type_options = sorted(df['Venue type'].dropna().unique().tolist())
-selected_venue_types, vt_all = multiselect_with_all("Venue Type", venue_type_options, key="filter_venue_type")
-
-# Venue Info filter (only for datasets that have this column)
-has_venue_info = 'Venue Info' in df.columns
-if has_venue_info:
-    venue_info_options = sorted(df['Venue Info'].dropna().unique().tolist())
-    selected_venue_info, vi_all = multiselect_with_all("Venue Info", venue_info_options, key="filter_venue_info")
-
 # Apply filters
 filtered_df = df.copy()
+
+if has_venue_info and not vi_all:
+    filtered_df = filtered_df[filtered_df['Venue Info'].isin(selected_venue_info)]
+
+if selected_venue_types and not vt_all:
+    filtered_df = filtered_df[filtered_df['Venue type'].isin(selected_venue_types)]
+
+if selected_media_owners and not mo_all:
+    filtered_df = filtered_df[filtered_df['Media owner'].isin(selected_media_owners)]
 
 if selected_regions and not regions_all:
     filtered_df = filtered_df[filtered_df['Site region (state)'].isin(selected_regions)]
@@ -210,12 +223,6 @@ if selected_allow_video and not allow_video_all:
 
 if selected_spot_lengths and not spots_all:
     filtered_df = filtered_df[filtered_df['Spot length'].isin(selected_spot_lengths)]
-
-if selected_venue_types and not vt_all:
-    filtered_df = filtered_df[filtered_df['Venue type'].isin(selected_venue_types)]
-
-if has_venue_info and not vi_all:
-    filtered_df = filtered_df[filtered_df['Venue Info'].isin(selected_venue_info)]
 
 # Display metrics
 col1, col2, col3, col4 = st.columns(4)
