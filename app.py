@@ -62,10 +62,10 @@ def load_data(cntry: str) -> pd.DataFrame:
         df = pd.read_csv('DOOH_Screens_data_SG.csv', encoding='cp1252')
     elif cntry == 'HK':
         df = pd.read_csv('DOOH_Screens_data_HK.csv', encoding='utf-8')
-    elif cntry == 'HK_NEW':
-        df = pd.read_csv('DOOH_Screens_data_HK_r23.csv', encoding='utf-8')
-    elif cntry == 'HK_NEW_PLAN':
-        df = pd.read_csv('New HK DOOH Screens.csv', encoding='utf-8')
+    elif cntry == 'HK_LATEST':
+        df = pd.read_csv('R27_HK_DOOH_Screens.csv', encoding='utf-8-sig')
+    elif cntry == 'HK_REMOVED':
+        df = pd.read_csv('R27_HK_DOOH_Removed.csv', encoding='utf-8-sig')
     elif cntry == 'SG Breakdown B1':
         df = pd.read_csv('DOOH_Screens_data_SG_Breakdown_B1.csv', encoding='utf-8')
     elif cntry == 'SG Breakdown B2':
@@ -155,22 +155,14 @@ st.markdown("---")
 st.sidebar.header("🔍 Filters")
 
 # Country filter (single select; no 'All')
-country_options = ['Previous HK DOOH Plan', 'New HK DOOH Plan']
+country_options = ['HK Latest DOOH Screens', 'HK Removed - Deconflicted Screens']
 selected_country = st.sidebar.selectbox("Country", country_options, index=0)
 
 # Get the country data
-if selected_country == 'Previous HK DOOH Plan':
-    df = load_country_data('HK_NEW')
-elif selected_country == 'New HK DOOH Plan':
-    df = load_country_data('HK_NEW_PLAN')
-elif selected_country == 'Singapore':
-    df = load_country_data('SG')
-elif selected_country == 'SG Breakdown B1':
-    df = load_country_data('SG Breakdown B1')
-elif selected_country == 'SG Breakdown B2':
-    df = load_country_data('SG Breakdown B2')
-elif selected_country == 'Hong Kong':
-    df = load_country_data('HK')
+if selected_country == 'HK Latest DOOH Screens':
+    df = load_country_data('HK_LATEST')
+elif selected_country == 'HK Removed - Deconflicted Screens':
+    df = load_country_data('HK_REMOVED')
 
 # Venue Info filter (only for datasets that have this column)
 has_venue_info = 'Venue Info' in df.columns
